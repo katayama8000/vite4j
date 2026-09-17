@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>dev.vitemanifest</groupId>
-  <artifactId>vite-manifest-parent</artifactId>
+  <groupId>io.github.katayama8000</groupId>
+  <artifactId>vite4j-parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>vite-manifest</name>
+  <name>vite4j</name>
   <description>Read Vite's build manifest from a JVM backend and render the tags a page needs.</description>
-  <url>https://github.com/katayama8000/vite-manifest</url>
+  <url>https://github.com/katayama8000/vite4j</url>
 
   <licenses>
     <license>
@@ -21,8 +21,8 @@
   </licenses>
 
   <modules>
-    <module>vite-manifest-core</module>
-    <module>vite-manifest-jackson</module>
+    <module>vite4j-core</module>
+    <module>vite4j-jackson</module>
   </modules>
 
   <properties>

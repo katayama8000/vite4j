@@ -1,4 +1,4 @@
-# vite-manifest
+# vite4j
 
 [日本語](README.ja.md)
 
@@ -21,19 +21,19 @@ There are integrations like this for [Laravel](https://github.com/laravel/vite-p
 
 ```xml
 <dependency>
-  <groupId>dev.vitemanifest</groupId>
-  <artifactId>vite-manifest-core</artifactId>
+  <groupId>io.github.katayama8000</groupId>
+  <artifactId>vite4j-core</artifactId>
   <version>0.1.0</version>
 </dependency>
 <!-- optional: parses the manifest with the Jackson you already have -->
 <dependency>
-  <groupId>dev.vitemanifest</groupId>
-  <artifactId>vite-manifest-jackson</artifactId>
+  <groupId>io.github.katayama8000</groupId>
+  <artifactId>vite4j-jackson</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-`vite-manifest-core` has no dependencies. `vite-manifest-jackson` declares Jackson as `provided`, so
+`vite4j-core` has no dependencies. `vite4j-jackson` declares Jackson as `provided`, so
 your application keeps control of the version.
 
 ## Use

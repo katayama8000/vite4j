@@ -1,4 +1,4 @@
-# vite-manifest
+# vite4j
 
 [English](README.md)
 
@@ -14,19 +14,19 @@ Vite は自前の `index.html` なら中のタグを書き換えてくれます�
 
 ```xml
 <dependency>
-  <groupId>dev.vitemanifest</groupId>
-  <artifactId>vite-manifest-core</artifactId>
+  <groupId>io.github.katayama8000</groupId>
+  <artifactId>vite4j-core</artifactId>
   <version>0.1.0</version>
 </dependency>
 <!-- 任意: すでに使っている Jackson でマニフェストをパースする -->
 <dependency>
-  <groupId>dev.vitemanifest</groupId>
-  <artifactId>vite-manifest-jackson</artifactId>
+  <groupId>io.github.katayama8000</groupId>
+  <artifactId>vite4j-jackson</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-`vite-manifest-core` は依存ゼロです。`vite-manifest-jackson` は Jackson を `provided` で宣言しているので、バージョンの主導権はアプリケーション側にあります。
+`vite4j-core` は依存ゼロです。`vite4j-jackson` は Jackson を `provided` で宣言しているので、バージョンの主導権はアプリケーション側にあります。
 
 ## 使い方
 

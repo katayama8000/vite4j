@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.katayama8000</groupId>
+    <artifactId>vite4j-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>vite4j-jackson</artifactId>
+  <name>vite4j-jackson</name>
+  <description>Parses the manifest with Jackson, using whichever version the application already has.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.github.katayama8000</groupId>
+      <artifactId>vite4j-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- provided: the application picks the version, so this never drags one in.
+         It is still on the compile and test classpaths here. -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>
