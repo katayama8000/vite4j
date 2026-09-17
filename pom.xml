@@ -19,6 +19,22 @@
     </license>
   </licenses>
 
+  <!-- Central rejects a release without these two. -->
+  <developers>
+    <developer>
+      <id>katayama8000</id>
+      <name>Tatsufumi Katayama</name>
+      <url>https://github.com/katayama8000</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/katayama8000/vite4j.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/katayama8000/vite4j.git</developerConnection>
+    <url>https://github.com/katayama8000/vite4j</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
@@ -54,4 +70,71 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- Everything a release needs and an ordinary build does not: the extra jars, the signature, and
+       the upload. Kept in a profile so `mvn test` stays fast and works without a signing key. -->
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.11.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <!-- The Portal holds the upload until it is released by hand. Nothing reaches Central
+                   because a deploy ran. -->
+              <autoPublish>false</autoPublish>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
