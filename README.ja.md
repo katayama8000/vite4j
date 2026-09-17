@@ -77,7 +77,7 @@ assets.html("src/main.tsx");
 
 ## 開発時
 
-dev server が動いている間はマニフェストがありません。`ViteDevServer` が本番用と同じ `ViteTags` インタフェースを実装しているので、テンプレート側は分岐せずに済みます。
+dev server が動いている間はマニフェストがありません。エントリをソースのまま配信し、スタイルは自分で差し込むためです。`ViteDevServer` が本番用と同じ `ViteTags` インタフェースを実装しているので、テンプレート側は分岐せずに済みます。
 
 ```java
 ViteTags vite = devMode
@@ -86,6 +86,40 @@ ViteTags vite = devMode
 ```
 
 `withReactRefresh()` は `@vitejs/plugin-react` が要求するプリアンブルを足します。
+
+### dev server を自動で検知する
+
+`devMode` を設定フラグで決めると、切り替えるたびに設定を書き換えて再起動することになります。dev server 自身に知らせてもらいましょう。数行の Vite 設定で、起動中だけファイルを置きます。
+
+```js
+import { unlinkSync, writeFileSync } from "node:fs"
+
+const hotFile = "public/hot"
+
+const hot = () => ({
+  name: "hot-file",
+  apply: "serve",
+  configureServer(server) {
+    server.httpServer?.once("listening", () => {
+      writeFileSync(hotFile, server.resolvedUrls.local[0])
+    })
+    const remove = () => {
+      try { unlinkSync(hotFile) } catch {}
+    }
+    process.on("exit", remove)
+    process.on("SIGINT", () => { remove(); process.exit() })
+    process.on("SIGTERM", () => { remove(); process.exit() })
+  },
+})
+```
+
+あとは勝手に切り替わります。
+
+```java
+ViteTags vite = HotFile.at(Paths.get("public/hot")).withReactRefresh().or(assets);
+```
+
+ファイルは呼び出しごとに読むので、dev server を起動・停止するだけで済みます。アプリケーション側は何も知る必要がなく、再起動も要りません。`public/hot` は `.gitignore` に入れてください。
 
 ## 別の JSON ライブラリを使う
 
