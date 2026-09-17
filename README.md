@@ -1,5 +1,11 @@
 # vite4j
 
+> **This repository has moved to [nulab/vite4j](https://github.com/nulab/vite4j).**
+>
+> That is where the work continues and where releases come from. This one is kept for its history and
+> is no longer updated. The library there is the same, under `com.nulab-inc:vite4j` and MIT rather
+> than Apache-2.0.
+
 [日本語](README.ja.md)
 
 Render the tags a [Vite](https://vite.dev) entry needs, from a JVM backend.
