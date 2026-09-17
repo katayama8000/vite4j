@@ -11,10 +11,10 @@ import java.util.Map;
 /**
  * Turns the manifest's JSON into chunks.
  *
- * <p>This is an interface rather than a fixed choice of library so that the core artifact carries no
- * dependencies and never dictates which JSON library, or which version of it, an application runs.
- * {@code vite4j-jackson} implements it with Jackson; an application that already has Gson,
- * Moshi or play-json can implement it in a few lines instead.
+ * <p>This is an interface rather than a fixed choice of library so that nothing here dictates which
+ * JSON library, or which version of it, an application runs. {@link
+ * io.github.katayama8000.vite4j.jackson.JacksonManifestParser} implements it for the common case; an
+ * application that reaches for Gson, Moshi or play-json instead implements it in a few lines.
  */
 @FunctionalInterface
 public interface ManifestParser {
