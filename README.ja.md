@@ -1,5 +1,9 @@
 # vite4j
 
+> **このリポジトリは [nulab/vite4j](https://github.com/nulab/vite4j) に移動しました。**
+>
+> 開発もリリースもそちらで続きます。ここは履歴のために残してあり、更新されません。中身は同じもので、座標が `com.nulab-inc:vite4j`、ライセンスが Apache-2.0 から MIT に変わっています。
+
 [English](README.md)
 
 [Vite](https://ja.vite.dev) のエントリに必要なタグを、JVM のバックエンドから生成します。
