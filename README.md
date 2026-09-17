@@ -5,9 +5,10 @@
 Render the tags a [Vite](https://vite.dev) entry needs, from a JVM backend.
 
 Vite rewrites the tags in its own `index.html`. A page your backend renders is markup Vite never sees,
-so it writes down what each entry needs and leaves the tags to you. vite4j reads that.
+so it writes down what each entry needs and leaves the tags to you. vite4j reads that and writes them,
+so no filename is spelled out in a template.
 
-Naming the files by hand works until the bundler splits one. Then the CSS of the split-out chunk is
+Spelling them out works until the bundler splits a chunk. Then the CSS of the split-out chunk is
 built, served, and never applied, because nothing links it.
 
 ## Install
@@ -44,11 +45,13 @@ ViteAssets assets = ViteAssets.builder(manifest)
         .build();
 ```
 
-Render per page:
+Then, per page, one call replaces every tag you would have written by hand:
 
 ```java
 assets.html("src/main.tsx");
 ```
+
+returns
 
 ```html
 <link rel="stylesheet" href="/assets/assets/shared-ChJ_j-JJ.css">
