@@ -82,8 +82,9 @@ the tags arrive on the page as text:
 
 ## Development
 
-While the dev server runs there is no manifest. `ViteDevServer` renders that mode behind the same
-`ViteTags` interface, so a template holds one of the two and does not branch:
+While the dev server runs there is no manifest — it serves the entry from source and injects styles
+itself. `ViteDevServer` renders that mode behind the same `ViteTags` interface, so a template holds
+one of the two and does not branch:
 
 ```java
 ViteTags vite = devMode
@@ -92,6 +93,47 @@ ViteTags vite = devMode
 ```
 
 `withReactRefresh()` adds the preamble `@vitejs/plugin-react` requires.
+
+### Detecting the dev server
+
+Deciding `devMode` from a config flag means setting it, and restarting to change it. Have the dev
+server say so instead: a few lines of Vite config write a file while it runs.
+
+```js
+import { unlinkSync, writeFileSync } from "node:fs"
+
+const hotFile = "public/hot"
+
+const hot = () => ({
+  name: "hot-file",
+  apply: "serve",
+  configureServer(server) {
+    server.httpServer?.once("listening", () => {
+      writeFileSync(hotFile, server.resolvedUrls.local[0])
+    })
+    const remove = () => {
+      try { unlinkSync(hotFile) } catch {}
+    }
+    process.on("exit", remove)
+    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+      process.on(signal, () => { remove(); process.exit() })
+    }
+  },
+})
+```
+
+Then the choice makes itself:
+
+```java
+ViteTags vite = HotFile.at(Paths.get("public/hot")).withReactRefresh().or(assets);
+```
+
+The file is read per call, so starting and stopping the dev server is enough — the application does
+not need to know, and does not need restarting. Add `public/hot` to `.gitignore`.
+
+`resolvedUrls.local[0]` is the URL Vite prints on startup, which is the one to write when the browser
+and the dev server agree on what to call the host. Behind Docker or a reverse proxy they may not, and
+`server.origin` in the Vite config is then the URL to write instead.
 
 ## Another JSON library
 
