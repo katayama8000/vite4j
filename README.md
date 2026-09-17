@@ -59,6 +59,17 @@ assets.html("src/main.tsx");
 `assetUrl` receives the path as the manifest spells it. Put a CDN host, a deployment version or a
 digest directory there.
 
+`html()` returns markup, and most template engines escape what you hand them. Tell yours not to, or
+the tags arrive on the page as text:
+
+```html
+<div th:utext="${viteTags}"></div>          <!-- Thymeleaf -->
+@Html(vite.html("src/main.tsx"))            @* Twirl *@
+<%= viteTags %>                             <%-- JSP, not <c:out> --%>
+```
+
+`tags()` returns the same tags as a list, for rendering them yourself.
+
 ## Options
 
 | | |
