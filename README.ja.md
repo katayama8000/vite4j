@@ -2,13 +2,11 @@
 
 [English](README.md)
 
-[Vite](https://ja.vite.dev) がビルド時に書き出すマニフェストを JVM のバックエンドから読み、ページに必要なタグを生成するライブラリです。
+[Vite](https://ja.vite.dev) のエントリに必要なタグを、JVM のバックエンドから生成します。
 
-Vite は自前の `index.html` なら中のタグを書き換えてくれます。しかし Play や Spring、Micronaut、http4s などがレンダリングする HTML は Vite からは見えないので、書き換えようがありません。代わりに Vite は「どのエントリに何が必要か」をマニフェストに記録し、タグの生成はバックエンドに委ねます。このライブラリはその記録を読みます。
+Vite は自前の `index.html` ならタグを書き換えますが、バックエンドが出す HTML は Vite からは見えません。代わりに「どのエントリに何が必要か」をマニフェストに記録します。vite4j はそれを読みます。
 
-ファイル名を決め打ちしても、しばらくは動いてしまいます。rollup はエントリが静的に import したものをすべてエントリチャンクに残していたので、CSS は 1 本しか出ず、名前を直接書いても問題ありませんでした。ところが rolldown は、動的 import されるチャンクと共有しているモジュールを別チャンクに切り出します。CSS もそれについて出ていき、どこからもリンクされないファイルになります。ビルドもされ、配信もされ、しかし一度も適用されない CSS ができあがります。
-
-同種の統合は [Laravel](https://github.com/laravel/vite-plugin)、[Rails](https://github.com/ElMassimo/vite_ruby)、[Django](https://github.com/MrBin99/django-vite)、[Symfony](https://github.com/lhapaipai/vite-bundle)、Go、Rust にはありますが、JVM にはありませんでした。
+ファイル名を手で書いても、バンドラがチャンクを分割するまでは動きます。分割された瞬間、切り出された CSS はビルドされ、配信され、どこからもリンクされないまま一度も適用されなくなります。
 
 ## インストール
 
@@ -20,85 +18,76 @@ Vite は自前の `index.html` なら中のタグを書き換えてくれます�
 </dependency>
 ```
 
-依存は何も付いてきません。Jackson は `optional` 依存で、使っているのは `JacksonManifestParser` だけです。すでに Jackson を持っているアプリケーション（ほとんどがそうです）は、そのバージョンのままパーサをそのまま使えます。持っていないアプリケーションには一切入りません。
+Java 11 以降。Jackson は optional で、使うのは `JacksonManifestParser` だけです。
 
 ## 使い方
-
-まず Vite にマニフェストを書かせます。
 
 ```js
 // vite.config.js
 export default defineConfig({
-  build: {
-    manifest: true,
-    rollupOptions: { input: "src/main.tsx" },
-  },
+  build: { manifest: true, rollupOptions: { input: "src/main.tsx" } },
 })
 ```
 
-起動時に一度読み、リクエストごとにタグを生成します。
+起動時に 1 回読みます。
 
 ```java
-ManifestParser parser = new JacksonManifestParser();
 ViteManifest manifest;
-try (InputStream in = classLoader.getResourceAsStream("public/.vite/manifest.json")) {
-    manifest = ViteManifest.of(parser.parse(in));
+try (InputStream in = loader.getResourceAsStream("public/.vite/manifest.json")) {
+    manifest = ViteManifest.of(new JacksonManifestParser().parse(in));
 }
 
 ViteAssets assets = ViteAssets.builder(manifest)
         .assetUrl(path -> "/assets/" + path)
-        .modulePreload(true)
         .build();
+```
 
+ページごとに生成します。
+
+```java
 assets.html("src/main.tsx");
 ```
 
 ```html
 <link rel="stylesheet" href="/assets/assets/shared-ChJ_j-JJ.css">
 <link rel="stylesheet" href="/assets/assets/main-5UjPuW-k.css">
-<link rel="modulepreload" href="/assets/assets/shared-B7PI925R.js">
 <script type="module" src="/assets/assets/main-BRBmoGS9.js"></script>
 ```
 
-`assetUrl` は、CDN のホスト名、デプロイごとのバージョン、ダイジェスト付きのディレクトリなどを差し込む場所です。マニフェストに書かれたままのパスが渡ってきます。
+`assetUrl` にはマニフェストに書かれたままのパスが渡ります。CDN のホスト、デプロイのバージョン、ダイジェスト付きディレクトリはここに入れてください。
 
-### 開発時
+## オプション
 
-dev server が動いている間はマニフェストもビルド済みファイルもありません。`ViteDevServer` がそのモードのタグを生成します。本番用の `ViteAssets` と同じ `ViteTags` インタフェースを実装しているので、テンプレート側はどちらのモードか気にせず同じ書き方で済みます。
+| | |
+| --- | --- |
+| `assetUrl(fn)` | マニフェストのパスを URL にする。既定は `/` を前置 |
+| `modulePreload(true)` | import したチャンクごとに `<link rel="modulepreload">` を出す。既定は off |
+
+## 開発時
+
+dev server が動いている間はマニフェストがありません。`ViteDevServer` が本番用と同じ `ViteTags` インタフェースを実装しているので、テンプレート側は分岐せずに済みます。
 
 ```java
 ViteTags vite = devMode
         ? ViteDevServer.at("http://localhost:5173/").withReactRefresh()
         : ViteAssets.builder(manifest).assetUrl(assetUrl).build();
-
-vite.html("src/main.tsx");
 ```
 
-`withReactRefresh()` は、`@vitejs/plugin-react` がコンポーネントの読み込み前に要求するプリアンブルを追加します。
+`withReactRefresh()` は `@vitejs/plugin-react` が要求するプリアンブルを足します。
 
-### Jackson を使わない場合
+## 別の JSON ライブラリを使う
 
-`ManifestParser` はメソッド 1 つだけのインタフェースなので、どの JSON ライブラリでも実装できます。
+`ManifestParser` はメソッド 1 つです。
 
 ```java
-ManifestParser parser = json -> {
-    Map<String, Chunk> chunks = new LinkedHashMap<>();
-    // ... file, css, imports を詰める
-    return chunks;
-};
+ManifestParser parser = json -> { /* → Map<String, Chunk> */ };
 ```
 
-## マニフェストをどう解釈するか
+## マニフェストの読み方
 
-Vite の [Backend Integration](https://ja.vite.dev/guide/backend-integration) ガイドにある 4 つの手順に従います。見落としやすいのは 2 番目です。**各チャンクは自分の CSS しか列挙しません。** つまり import しているチャンクもたどる必要があります。`manifest[entry].css` を読んで終わりにすると、バンドラが切り出した分がまるごと漏れます。
+[Backend Integration](https://ja.vite.dev/guide/backend-integration) の手順に従います。見落としやすいのは、**各チャンクが自分の CSS しか列挙しない**ことです。import 先のチャンクもたどる必要があります。`manifest[entry].css` を読んで終わりにすると、バンドラが切り出した分が漏れます。
 
-順序は import 側が先、そのチャンク自身の CSS が最後です。これはモジュールの実行順であり、Vite 自身が出力する順序でもあります。したがって、同じ詳細度で競合したときにどちらのルールが勝つかは、Vite がレンダリングしたページと同じになります。
-
-2 つのチャンクが共有する CSS は 1 回だけリンクされます。循環があっても停止します。マニフェストに存在しないチャンクは例外を投げずにスキップします。マニフェストはビルドの成果物であり、スタイルが一部欠けたページのほうが、レンダリングに失敗するページよりましだからです。
-
-## 要件
-
-Java 11 以降。
+順序は import 側が先、自分の CSS が最後です。モジュールの実行順であり、Vite が出力する順序でもあります。共有 CSS は 1 回だけリンクされ、循環しても停止し、マニフェストに無いチャンクは例外を投げずにスキップします。
 
 ## ライセンス
 
