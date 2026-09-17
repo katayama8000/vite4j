@@ -1,5 +1,7 @@
 # vite-manifest
 
+[日本語](README.ja.md)
+
 Read [Vite](https://vite.dev)'s build manifest from a JVM backend and render the tags a page needs.
 
 Vite rewrites the tags in its own `index.html`. A page rendered by Play, Spring, Micronaut, http4s or

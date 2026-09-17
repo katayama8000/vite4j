@@ -1,5 +1,24 @@
+# Maven
 target/
+pom.xml.versionsBackup
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
 *.iml
+*.ipr
+*.iws
 .idea/
 .vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Java
+*.class
+hs_err_pid*
+replay_pid*
