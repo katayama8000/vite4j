@@ -22,19 +22,14 @@ There are integrations like this for [Laravel](https://github.com/laravel/vite-p
 ```xml
 <dependency>
   <groupId>io.github.katayama8000</groupId>
-  <artifactId>vite4j-core</artifactId>
-  <version>0.1.0</version>
-</dependency>
-<!-- optional: parses the manifest with the Jackson you already have -->
-<dependency>
-  <groupId>io.github.katayama8000</groupId>
-  <artifactId>vite4j-jackson</artifactId>
+  <artifactId>vite4j</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-`vite4j-core` has no dependencies. `vite4j-jackson` declares Jackson as `provided`, so
-your application keeps control of the version.
+Nothing comes with it. Jackson is an `optional` dependency, used by `JacksonManifestParser` and
+nothing else, so an application that already has Jackson — most do — gets the parser for free at
+whatever version it already runs, and one that doesn't never sees it.
 
 ## Use
 

@@ -15,18 +15,12 @@ Vite は自前の `index.html` なら中のタグを書き換えてくれます�
 ```xml
 <dependency>
   <groupId>io.github.katayama8000</groupId>
-  <artifactId>vite4j-core</artifactId>
-  <version>0.1.0</version>
-</dependency>
-<!-- 任意: すでに使っている Jackson でマニフェストをパースする -->
-<dependency>
-  <groupId>io.github.katayama8000</groupId>
-  <artifactId>vite4j-jackson</artifactId>
+  <artifactId>vite4j</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-`vite4j-core` は依存ゼロです。`vite4j-jackson` は Jackson を `provided` で宣言しているので、バージョンの主導権はアプリケーション側にあります。
+依存は何も付いてきません。Jackson は `optional` 依存で、使っているのは `JacksonManifestParser` だけです。すでに Jackson を持っているアプリケーション（ほとんどがそうです）は、そのバージョンのままパーサをそのまま使えます。持っていないアプリケーションには一切入りません。
 
 ## 使い方
 

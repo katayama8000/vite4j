@@ -5,9 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.github.katayama8000</groupId>
-  <artifactId>vite4j-parent</artifactId>
+  <artifactId>vite4j</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
 
   <name>vite4j</name>
   <description>Read Vite's build manifest from a JVM backend and render the tags a page needs.</description>
@@ -20,11 +19,6 @@
     </license>
   </licenses>
 
-  <modules>
-    <module>vite4j-core</module>
-    <module>vite4j-jackson</module>
-  </modules>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
@@ -32,35 +26,32 @@
     <jackson.version>2.18.2</jackson.version>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>${junit.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+    <!-- optional: JacksonManifestParser uses it, nothing else does, and it is never passed on to
+         whoever depends on this. Applications that have Jackson - which is most of them - get the
+         parser for free; the rest implement ManifestParser against the JSON library they do have. -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+      <optional>true</optional>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.2</version>
+      </plugin>
+    </plugins>
   </build>
 </project>
