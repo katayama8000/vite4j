@@ -107,8 +107,9 @@ const hot = () => ({
       try { unlinkSync(hotFile) } catch {}
     }
     process.on("exit", remove)
-    process.on("SIGINT", () => { remove(); process.exit() })
-    process.on("SIGTERM", () => { remove(); process.exit() })
+    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+      process.on(signal, () => { remove(); process.exit() })
+    }
   },
 })
 ```
@@ -120,6 +121,8 @@ ViteTags vite = HotFile.at(Paths.get("public/hot")).withReactRefresh().or(assets
 ```
 
 ファイルは呼び出しごとに読むので、dev server を起動・停止するだけで済みます。アプリケーション側は何も知る必要がなく、再起動も要りません。`public/hot` は `.gitignore` に入れてください。
+
+`resolvedUrls.local[0]` は Vite が起動時に表示する URL です。ブラウザと dev server がホスト名の認識を共有していれば、これを書けば済みます。Docker やリバースプロキシを挟むと一致しないことがあり、その場合は Vite 設定の `server.origin` に指定した URL を書いてください。
 
 ## 別の JSON ライブラリを使う
 

@@ -115,8 +115,9 @@ const hot = () => ({
       try { unlinkSync(hotFile) } catch {}
     }
     process.on("exit", remove)
-    process.on("SIGINT", () => { remove(); process.exit() })
-    process.on("SIGTERM", () => { remove(); process.exit() })
+    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+      process.on(signal, () => { remove(); process.exit() })
+    }
   },
 })
 ```
@@ -129,6 +130,10 @@ ViteTags vite = HotFile.at(Paths.get("public/hot")).withReactRefresh().or(assets
 
 The file is read per call, so starting and stopping the dev server is enough — the application does
 not need to know, and does not need restarting. Add `public/hot` to `.gitignore`.
+
+`resolvedUrls.local[0]` is the URL Vite prints on startup, which is the one to write when the browser
+and the dev server agree on what to call the host. Behind Docker or a reverse proxy they may not, and
+`server.origin` in the Vite config is then the URL to write instead.
 
 ## Another JSON library
 
